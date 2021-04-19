@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as devstage
+FROM ubuntu:18.04 as esp32_devstage
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     git \
     gperf \
     lcov \
+    nano \
     libncurses-dev \
     libusb-1.0-0-dev \
     make \
@@ -79,9 +80,13 @@ COPY entrypoint.sh /opt/esp/entrypoint.sh
 # Add user dev to the image
 RUN adduser --quiet dev && \
     echo "dev:$DEV_PW" | chpasswd && \
-    mkdir /home/dev/.m2 && \
-    mkdir /home/dev/dev && \
     chown -R dev /home/dev 
+
+RUN echo '. /opt/esp/idf/export.sh > /dev/null 2>&1 & ' >> /home/dev/.bashrc 
+
+RUN export LC_ALL="en_US.UTF-8"
+RUN export LC_CTYPE="en_US.UTF-8"
+RUN dpkg-reconfigure locales
 
 ENTRYPOINT [ "/opt/esp/entrypoint.sh" ]
 CMD [ "/bin/bash" ]
@@ -89,7 +94,7 @@ CMD [ "/bin/bash" ]
 ######################################################################################################
 #                           Stage: jenkins                                                           #
 ######################################################################################################
-FROM devstage as jenkinsstage
+FROM esp32_devstage as esp32_jenkinsstage
 
 ARG JENKINS_PW
 
@@ -100,7 +105,6 @@ RUN adduser --quiet jenkins && \
     mkdir /home/jenkins/.m2 && \
     mkdir /home/jenkins/jenkins && \
     chown -R jenkins /home/jenkins 
-#JENKINS END
 
 # Setup SSH server
 RUN mkdir /var/run/sshd
