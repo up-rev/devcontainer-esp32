@@ -6,6 +6,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG DEV_PW=password
 ARG JENKINS_PW=jenkins
 
+ENV LC_CTYPE en_US.UTF-8
+ENV LANG en_US.UTF-8
+
 # We need libpython2.7 due to GDB tools
 RUN apt-get update && apt-get install -y \
     apt-utils \
@@ -29,6 +32,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     xz-utils \
     zip \
+    locales \
    && apt-get autoremove -y \
    && rm -rf /var/lib/apt/lists/* \
    && update-alternatives --install /usr/bin/python python /usr/bin/python3 10
@@ -36,7 +40,7 @@ RUN apt-get update && apt-get install -y \
 RUN apt install -y python3-pip
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
-RUN python -m pip install --upgrade pip virtualenv polypacket mrtutils
+RUN python -m pip install --upgrade pip virtualenv mrtutils
 
 # To build the image for a branch or a tag of IDF, pass --build-arg IDF_CLONE_BRANCH_OR_TAG=name.
 # To build the image with a specific commit ID of IDF, pass --build-arg IDF_CHECKOUT_REF=commit-id.
@@ -87,8 +91,10 @@ CMD [ "/bin/bash" ]
 ######################################################################################################
 FROM devstage as jenkinsstage
 
+ARG JENKINS_PW
+
 #install jenkins dependencies
-RUN apt install apt install -qq -y --no-install-recommends openjdk-8-jdk  openssh-server ca-certificates
+RUN apt update && apt install -qq -y --no-install-recommends openjdk-8-jdk  openssh-server ca-certificates
 RUN adduser --quiet jenkins && \
     echo "jenkins:$JENKINS_PW" | chpasswd && \
     mkdir /home/jenkins/.m2 && \
