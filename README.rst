@@ -5,7 +5,7 @@ This is a development container for developing ESP32 projects. It includes all o
 
 Once the container is open, run:
 
-.. code-block:: bash 
+.. code:: bash 
 
      ./opt/esp/idf/export.sh 
 
@@ -15,7 +15,7 @@ Issues
 
 There is an issue where you may get an error about unsupported locale settings. This can be fixed with the following:
 
-.. code-bloc:: bash 
+.. code:: bash 
 
     export LC_ALL="en_US.UTF-8"
     export LC_CTYPE="en_US.UTF-8"
@@ -29,7 +29,7 @@ There are two stages to the build. The first sets up a dev environment, and the 
 
 .. note:: the export script (/opt/eps/idf/export.sh) is automatically run for the ``dev`` user but not the ``jenkins`` user. This is to allow for projects that provide their own IDF. If you want to use the built in version, run the script in the build job.
 
-.. code-block:: bash 
+.. code:: bash 
 
     docker build . --target=devstaget 
 
